@@ -20,7 +20,7 @@ app.get('/api/health', async (req, res) => {
         res.status(500).json({ status: 'ERROR', message: err.message });
     }
 });
-
+//alo
 // API lấy lịch sử bơm nước theo mã bồn (Lấy 100 dòng gần nhất)
 app.get('/api/pump-history/:tankCode', async (req, res) => {
     try {
