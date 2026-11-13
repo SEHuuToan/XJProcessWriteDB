@@ -1,18 +1,32 @@
 CREATE DATABASE IF NOT EXISTS XJProcessDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE XJProcessDB;
 
-CREATE TABLE IF NOT EXISTS XJPumpWater (
-    id VARCHAR(36) PRIMARY KEY COMMENT 'UID từ PLC hoặc Backend sinh ra',
-    tank_code VARCHAR(50) NOT NULL COMMENT 'Mã số bồn (VD: DRUM-01)',
-    pump_mode VARCHAR(20) NOT NULL COMMENT 'Chế độ bơm: MANUAL (Thủ công) / AUTO (Tự động)',
-    water_type VARCHAR(20) NOT NULL COMMENT 'Loại nước: HOT (Nóng) / COLD (Lạnh)',
-    temperature INT DEFAULT 0 COMMENT 'Nhiệt độ nước (°C)',
-    target_volume INT DEFAULT 0 COMMENT 'Lượng nước cần bơm (Lít)',
-    actual_volume INT DEFAULT 0 COMMENT 'Lượng nước thực tế đã bơm (Lít)',
-    pumped_seconds INT DEFAULT 0 COMMENT 'Thời gian đã bơm (giây)',
-    pumped_duration_text VARCHAR(20) COMMENT 'Thời gian quy đổi (HH:mm:ss)',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Thời điểm ghi nhận xuống DB',
+DROP TABLE IF EXISTS XJPumpWater;
+
+CREATE TABLE XJPumpWater (
+    id VARCHAR(36) PRIMARY KEY COMMENT 'UUID sinh ra cho mỗi bản ghi',
+    tank_code VARCHAR(50) NOT NULL COMMENT 'Mã số bồn (Ứng với SoThung)',
+    cold_hot BOOLEAN DEFAULT 0 COMMENT 'Nước nóng (true) hay lạnh (false)',
+    pump_mode VARCHAR(20) NOT NULL COMMENT 'Chế độ: AUTO (true) hoặc MANUAL (false)',
+    temperature INT DEFAULT 0 COMMENT 'Nhiệt độ (NhietDo)',
+    flow_rate INT DEFAULT 0 COMMENT 'Lưu lượng (LuuLuong)',
     
-    -- Đánh Index để tối ưu tốc độ truy vấn lịch sử theo bồn và thời gian
+    -- 5 thùng hóa chất
+    chem_tank_1 VARCHAR(50) COMMENT 'THUNG1',
+    chem_tank_2 VARCHAR(50) COMMENT 'THUNG2',
+    chem_tank_3 VARCHAR(50) COMMENT 'THUNG3',
+    chem_tank_4 VARCHAR(50) COMMENT 'THUNG4',
+    chem_tank_5 VARCHAR(50) COMMENT 'THUNG5',
+    
+    -- Lượng nước bơm vào từng thùng tương ứng
+    water_vol_1 INT DEFAULT 0 COMMENT 'LN_THUNG1',
+    water_vol_2 INT DEFAULT 0 COMMENT 'LN_THUNG2',
+    water_vol_3 INT DEFAULT 0 COMMENT 'LN_THUNG3',
+    water_vol_4 INT DEFAULT 0 COMMENT 'LN_THUNG4',
+    water_vol_5 INT DEFAULT 0 COMMENT 'LN_THUNG5',
+    
+    plc_time TIMESTAMP NULL COMMENT 'Thời gian gốc do PLC gửi lên',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Thời điểm ghi nhận thực tế xuống DB',
+    
     INDEX idx_tank_time (tank_code, created_at)
 ) ENGINE=InnoDB;
